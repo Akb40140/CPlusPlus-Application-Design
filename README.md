@@ -4,7 +4,7 @@
 
 **Class:** C++ Application Design
 
-**Application:** Not decided yet, this section will be updated once the application idea is finalized.
+**Application:** Not decided yet
 
 My C++ Application Design class projects and assignments.
 

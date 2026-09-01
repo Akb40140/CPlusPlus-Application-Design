@@ -1,10 +1,10 @@
 # C++-Application-Design
 
-**Name:** Ahmed
+**Name:** Ahmed Mohammed
 
-**Class:** C++ Application Design
+**Class:** Teach C++
 
-**Application:** learn c++
+**Application:** not decided
 
 My C++ Application Design class projects and assignments.
 

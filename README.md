@@ -1,10 +1,10 @@
-# CPlusPlus-Application-Design
+# C++-Application-Design
 
 **Name:** Ahmed
 
 **Class:** C++ Application Design
 
-**Application:** Not decided yet
+**Application:** learn c++
 
 My C++ Application Design class projects and assignments.
 

@@ -18,7 +18,7 @@ const int MAX_RECORDS = 10;   // how many records the arrays can hold
 // ---- Input helpers -------------------------------------------------------
 
 // Reads one whole line so names with spaces still work.
-string readLine(const string& prompt) {
+string readLine(string prompt) {
     string line;
     cout << prompt;
     getline(cin, line);
@@ -26,7 +26,7 @@ string readLine(const string& prompt) {
 }
 
 // Reads a number and rejects anything that is not one.
-double readNumber(const string& prompt) {
+double readNumber(string prompt) {
     double value = 0.0;
     while (true) {
         cout << prompt;
@@ -70,7 +70,7 @@ void loadDataset(string* nameList, int* idList, double* gradeList, int* count) {
 
 // Returns a pointer to the matching name, or nullptr when there is no match.
 // Returning an address lets the caller edit the record it found.
-string* findRecord(string* nameList, int count, const string& target) {
+string* findRecord(string* nameList, int count, string target) {
     for (int i = 0; i < count; i++) {
         // *(nameList + i) is pointer arithmetic for nameList[i].
         if (*(nameList + i) == target) {
@@ -81,8 +81,8 @@ string* findRecord(string* nameList, int count, const string& target) {
 }
 
 // Pointer subtraction: the gap between the two addresses is the slot number.
-int slotOf(const string* found, const string* nameList) {
-    return static_cast<int>(found - nameList);
+int slotOf(string* found, string* nameList) {
+    return found - nameList;
 }
 
 // ---- Menu actions --------------------------------------------------------
@@ -96,15 +96,15 @@ void addRecord(string* nameList, int* idList, double* gradeList, int* count) {
 
     cout << endl;
     *(nameList + *count)  = readLine("Enter student name: ");
-    *(idList + *count)    = static_cast<int>(readNumber("Enter student id: "));
+    *(idList + *count)    = (int)readNumber("Enter student id: ");
     *(gradeList + *count) = readNumber("Enter math score (0-100): ");
 
     (*count)++;   // writing through the pointer updates the count in main
     cout << "Record saved in slot " << *count << "." << endl;
 }
 
-void viewRecords(const string* nameList, const int* idList,
-                 const double* gradeList, int count) {
+void viewRecords(string* nameList, int* idList,
+                 double* gradeList, int count) {
     cout << endl;
     if (count == 0) {
         cout << "No records yet. Use option 1 to add one." << endl;
@@ -124,8 +124,8 @@ void viewRecords(const string* nameList, const int* idList,
     }
 }
 
-void searchRecords(string* nameList, const int* idList,
-                   const double* gradeList, int count) {
+void searchRecords(string* nameList, int* idList,
+                   double* gradeList, int count) {
     cout << endl;
     string target = readLine("Enter the name to search for: ");
     string* found = findRecord(nameList, count, target);
@@ -176,7 +176,7 @@ void deleteRecord(string* nameList, int* idList, double* gradeList, int* count) 
     cout << "Deleted " << target << ". " << *count << " record(s) left." << endl;
 }
 
-void showAverage(const double* gradeList, int count) {
+void showAverage(double* gradeList, int count) {
     cout << endl;
     if (count == 0) {
         cout << "No records yet, so there is no average." << endl;
@@ -193,7 +193,7 @@ void showAverage(const double* gradeList, int count) {
 
 // The assignment asks for one value reached through a pointer. This is that
 // demonstration on its own: a pointer aimed at a single array element.
-void pointerDemo(const string* nameList, const double* gradeList, int count) {
+void pointerDemo(string* nameList, double* gradeList, int count) {
     cout << endl;
     if (count == 0) {
         cout << "Load or add a record first." << endl;
@@ -203,7 +203,7 @@ void pointerDemo(const string* nameList, const double* gradeList, int count) {
     cout << "=== POINTER DEMO ===" << endl;
 
     // &gradeList[0] is the address of the first score.
-    const double* scorePtr = &gradeList[0];
+    double* scorePtr = &gradeList[0];
     cout << "scorePtr points at slot 1." << endl;
     cout << "  *scorePtr (the value)  = "
          << fixed << setprecision(2) << *scorePtr << endl;
@@ -214,8 +214,7 @@ void pointerDemo(const string* nameList, const double* gradeList, int count) {
         cout << "After scorePtr + 1 it points at slot 2." << endl;
         cout << "  *scorePtr (the value)  = " << *scorePtr << endl;
         cout << "  scorePtr (the address) = " << scorePtr << endl;
-        cout << "The address moved by " << sizeof(double)
-             << " bytes, the size of one double." << endl;
+        cout << "The address moved by 8 bytes, the size of one double." << endl;
     }
 
     // The same idea on the name array, where each element is a string.

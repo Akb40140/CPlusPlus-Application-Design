@@ -1,337 +1,119 @@
-// Module 4 - Datasets, Arrays, and Pointers
-// Builds on the Module 2 menu app. A small Kaggle dataset is loaded into
-// parallel arrays, and every function reaches that data through pointers.
+// Module 4 - Datasets, Arrays & Pointers
+// Student Record Manager, now with real data from Kaggle stored in arrays.
 //
-// Dataset: "Students Performance in Exams" (Kaggle, spscientist)
+// Dataset: "Students Performance in Exams" on Kaggle
 // https://www.kaggle.com/datasets/spscientist/students-performance-in-exams
-// The source rows are anonymous, so the first 8 were cut down to three fields
-// and given placeholder names, since the app searches by name.
-
+// I took the first 8 rows and kept the math score. The dataset doesn't have
+// names, so I made some up.
 #include <iostream>
 #include <fstream>
-#include <iomanip>
 #include <limits>
 #include <string>
 using namespace std;
 
-const int MAX_RECORDS = 10;   // how many records the arrays can hold
+const int MAX_RECORDS = 10;
 
-// ---- Input helpers -------------------------------------------------------
-
-// Reads one whole line so names with spaces still work.
-string readLine(string prompt) {
-    string line;
-    cout << prompt;
-    getline(cin, line);
-    return line;
-}
-
-// Reads a number and rejects anything that is not one.
-double readNumber(string prompt) {
-    double value = 0.0;
-    while (true) {
-        cout << prompt;
-        if (cin >> value) {
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            return value;
-        }
-        if (cin.eof()) {
-            return 0.0;
-        }
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "That is not a number. Try again." << endl;
-    }
-}
-
-// ---- Dataset -------------------------------------------------------------
-// The arrays live in main(). Every function below receives them as pointers,
-// so nothing is copied and the functions work on the real data.
-
-// Reads the dataset from students.csv with an ifstream (an input file stream
-// from <fstream>). Each line of the file looks like:
-//
-//     Ada,1001,72
-//
-// getline(file, text, ',') reads up to the next comma, so the three fields come
-// off one at a time. The last field uses plain getline, which reads to the end
-// of the line. Returns true when the file opened.
-bool loadDataset(string fileName, string* nameList, int* idList,
-                 double* gradeList, int* count) {
-    ifstream file(fileName);   // opens the file for reading
-
+// Reads students.csv into the arrays and returns how many records it read.
+int loadRecords(string fileName, string names[], int ids[], double scores[]) {
+    ifstream file(fileName);
     if (!file.is_open()) {
         cout << "Could not open " << fileName << "." << endl;
-        cout << "Keep the file in the same folder as the program." << endl;
-        return false;
+        return 0;
     }
 
-    string headerLine;
-    getline(file, headerLine);   // skip the column titles on line 1
+    string header, name, idText, scoreText;
+    getline(file, header);   // skip the first line
 
-    string name, idText, gradeText;
-    *count = 0;
-
-    // Stop at the end of the file, or when the arrays are full.
-    while (*count < MAX_RECORDS &&
-           getline(file, name, ',') &&
-           getline(file, idText, ',') &&
-           getline(file, gradeText)) {
-
-        if (name == "") {
-            continue;   // skip a blank line at the end of the file
-        }
-
-        // The fields arrive as text, so the numbers have to be converted.
-        *(nameList + *count)  = name;
-        *(idList + *count)    = stoi(idText);
-        *(gradeList + *count) = stod(gradeText);
-
-        (*count)++;   // written through the pointer, so main sees it
+    int count = 0;
+    while (count < MAX_RECORDS && getline(file, name, ',') &&
+           getline(file, idText, ',') && getline(file, scoreText)) {
+        names[count] = name;
+        ids[count] = stoi(idText);       // text to int
+        scores[count] = stod(scoreText); // text to double
+        count++;
     }
 
     file.close();
-    return true;
+    return count;
 }
 
-// ---- Finding a record ----------------------------------------------------
-
-// Returns a pointer to the matching name, or nullptr when there is no match.
-// Returning an address lets the caller edit the record it found.
-string* findRecord(string* nameList, int count, string target) {
+void displayRecords(string names[], int ids[], double scores[], int count) {
     for (int i = 0; i < count; i++) {
-        // *(nameList + i) is pointer arithmetic for nameList[i].
-        if (*(nameList + i) == target) {
-            return nameList + i;
+        cout << names[i] << " (id " << ids[i] << ") - " << scores[i] << endl;
+    }
+}
+
+void searchRecords(string names[], int ids[], double scores[], int count) {
+    string target;
+    cout << "Enter a name: ";
+    getline(cin, target);
+
+    for (int i = 0; i < count; i++) {
+        if (names[i] == target) {
+            cout << names[i] << " (id " << ids[i] << ") - " << scores[i] << endl;
+            return;
         }
     }
-    return nullptr;
+    cout << "No record found." << endl;
 }
 
-// Pointer subtraction: the gap between the two addresses is the slot number.
-int slotOf(string* found, string* nameList) {
-    return found - nameList;
-}
-
-// ---- Menu actions --------------------------------------------------------
-
-void addRecord(string* nameList, int* idList, double* gradeList, int* count) {
-    // *count dereferences the pointer to read the real record count.
-    if (*count >= MAX_RECORDS) {
-        cout << "\nThe dataset is full. Delete a record first." << endl;
-        return;
-    }
-
-    cout << endl;
-    *(nameList + *count)  = readLine("Enter student name: ");
-    *(idList + *count)    = (int)readNumber("Enter student id: ");
-    *(gradeList + *count) = readNumber("Enter math score (0-100): ");
-
-    (*count)++;   // writing through the pointer updates the count in main
-    cout << "Record saved in slot " << *count << "." << endl;
-}
-
-void viewRecords(string* nameList, int* idList,
-                 double* gradeList, int count) {
-    cout << endl;
+void pointerDemo(string names[], double scores[], int count) {
     if (count == 0) {
-        cout << "No records yet. Use option 1 to add one." << endl;
+        cout << "No records loaded." << endl;
         return;
     }
 
-    cout << "=== ALL RECORDS ===" << endl;
-    cout << left << setw(5) << "#" << setw(22) << "NAME"
-         << setw(10) << "ID" << "MATH SCORE" << endl;
-
-    // Walk the arrays with pointers instead of an index.
-    for (int i = 0; i < count; i++) {
-        cout << left << setw(5) << (i + 1)
-             << setw(22) << *(nameList + i)
-             << setw(10) << *(idList + i)
-             << fixed << setprecision(2) << *(gradeList + i) << endl;
-    }
+    double* scorePtr = &scores[0];   // points to the first score
+    cout << "First student: " << names[0] << endl;
+    cout << "Score through pointer: " << *scorePtr << endl;
+    cout << "Address in memory: " << scorePtr << endl;
 }
 
-void searchRecords(string* nameList, int* idList,
-                   double* gradeList, int count) {
-    cout << endl;
-    string target = readLine("Enter the name to search for: ");
-    string* found = findRecord(nameList, count, target);
-
-    if (found == nullptr) {
-        cout << "No record found for " << target << "." << endl;
-        return;
-    }
-
-    int slot = slotOf(found, nameList);
-    cout << "Found in slot " << (slot + 1) << ": "
-         << *found << " (id " << idList[slot] << ") - "
-         << fixed << setprecision(2) << gradeList[slot] << endl;
-}
-
-void updateRecord(string* nameList, double* gradeList, int count) {
-    cout << endl;
-    string target = readLine("Enter the name to update: ");
-    string* found = findRecord(nameList, count, target);
-
-    if (found == nullptr) {
-        cout << "No record found for " << target << "." << endl;
-        return;
-    }
-
-    gradeList[slotOf(found, nameList)] = readNumber("Enter the new math score: ");
-    cout << "Updated " << *found << "." << endl;
-}
-
-void deleteRecord(string* nameList, int* idList, double* gradeList, int* count) {
-    cout << endl;
-    string target = readLine("Enter the name to delete: ");
-    string* found = findRecord(nameList, *count, target);
-
-    if (found == nullptr) {
-        cout << "No record found for " << target << "." << endl;
-        return;
-    }
-
-    // Shift every later record back one slot so there is no hole.
-    for (int i = slotOf(found, nameList); i < *count - 1; i++) {
-        nameList[i] = nameList[i + 1];
-        idList[i] = idList[i + 1];
-        gradeList[i] = gradeList[i + 1];
-    }
-
-    (*count)--;
-    cout << "Deleted " << target << ". " << *count << " record(s) left." << endl;
-}
-
-void showAverage(double* gradeList, int count) {
-    cout << endl;
-    if (count == 0) {
-        cout << "No records yet, so there is no average." << endl;
-        return;
-    }
-
-    double total = 0.0;
-    for (int i = 0; i < count; i++) {
-        total += *(gradeList + i);
-    }
-    cout << "Average math score for " << count << " record(s): "
-         << fixed << setprecision(2) << (total / count) << endl;
-}
-
-// The assignment asks for one value reached through a pointer. This is that
-// demonstration on its own: a pointer aimed at a single array element.
-void pointerDemo(string* nameList, double* gradeList, int count) {
-    cout << endl;
-    if (count == 0) {
-        cout << "Load or add a record first." << endl;
-        return;
-    }
-
-    cout << "=== POINTER DEMO ===" << endl;
-
-    // &gradeList[0] is the address of the first score.
-    double* scorePtr = &gradeList[0];
-    cout << "scorePtr points at slot 1." << endl;
-    cout << "  *scorePtr (the value)  = "
-         << fixed << setprecision(2) << *scorePtr << endl;
-    cout << "  scorePtr (the address) = " << scorePtr << endl;
-
-    if (count > 1) {
-        scorePtr++;   // step forward one element and read through it again
-        cout << "After scorePtr + 1 it points at slot 2." << endl;
-        cout << "  *scorePtr (the value)  = " << *scorePtr << endl;
-        cout << "  scorePtr (the address) = " << scorePtr << endl;
-        cout << "The address moved by 8 bytes, the size of one double." << endl;
-    }
-
-    // The same idea on the name array, where each element is a string.
-    cout << "First name through a pointer: " << *nameList << endl;
-}
-
-// ---- Menu ----------------------------------------------------------------
-
-void showMenu(int count) {
+void showMenu() {
     cout << "\n=== STUDENT RECORD MANAGER ===" << endl;
-    cout << "Records stored: " << count << " of " << MAX_RECORDS << endl;
-    cout << "1. Add Record" << endl;
-    cout << "2. View Records" << endl;
-    cout << "3. Search" << endl;
-    cout << "4. Update Record" << endl;
-    cout << "5. Delete Record" << endl;
-    cout << "6. Show Average Score" << endl;
-    cout << "7. Pointer Demo" << endl;
-    cout << "8. Exit" << endl;
-    cout << "Choose an option (1-8): ";
-}
-
-// Same validation idea as Module 2: a letter puts cin in a fail state, so we
-// clear it and throw the bad text away instead of looping forever.
-int readChoice() {
-    int choice = 0;
-
-    while (!(cin >> choice)) {
-        if (cin.eof()) {
-            return 8;   // no more input, treat it as Exit
-        }
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "That is not a number. Please enter 1-8: ";
-    }
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    return choice;
+    cout << "1. Display Records" << endl;
+    cout << "2. Search" << endl;
+    cout << "3. Pointer Demo" << endl;
+    cout << "4. Exit" << endl;
+    cout << "Choose an option (1-4): ";
 }
 
 int main() {
-    // Position i in each array is the same student: names[2], ids[2] and
-    // grades[2] are all record 3.
+    // Parallel arrays: names[0], ids[0] and scores[0] are all the same student
     string names[MAX_RECORDS];
     int ids[MAX_RECORDS];
-    double grades[MAX_RECORDS];
-    int recordCount = 0;        // how many slots are actually filled
+    double scores[MAX_RECORDS];
+    int count = loadRecords("students.csv", names, ids, scores);
     int choice = 0;
 
-    // An array name is the address of its first element, so passing names
-    // passes a pointer. &recordCount lets a function change the count itself.
-    if (loadDataset("students.csv", names, ids, grades, &recordCount)) {
-        cout << "Loaded " << recordCount
-             << " records from students.csv." << endl;
-    }
-    viewRecords(names, ids, grades, recordCount);
-    pointerDemo(names, grades, recordCount);
+    cout << "Loaded " << count << " records from students.csv." << endl;
 
-    while (choice != 8) {
-        showMenu(recordCount);
-        choice = readChoice();
+    while (choice != 4) {
+        showMenu();
+        if (!(cin >> choice)) {
+            if (cin.eof()) {
+                break;
+            }
+            cin.clear();   // bad input like "abc"
+            choice = 0;
+        }
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (choice) {
             case 1:
-                addRecord(names, ids, grades, &recordCount);
+                displayRecords(names, ids, scores, count);
                 break;
             case 2:
-                viewRecords(names, ids, grades, recordCount);
+                searchRecords(names, ids, scores, count);
                 break;
             case 3:
-                searchRecords(names, ids, grades, recordCount);
+                pointerDemo(names, scores, count);
                 break;
             case 4:
-                updateRecord(names, grades, recordCount);
-                break;
-            case 5:
-                deleteRecord(names, ids, grades, &recordCount);
-                break;
-            case 6:
-                showAverage(grades, recordCount);
-                break;
-            case 7:
-                pointerDemo(names, grades, recordCount);
-                break;
-            case 8:
-                cout << "\nGoodbye!" << endl;
+                cout << "Goodbye!" << endl;
                 break;
             default:
-                cout << "\nInvalid choice. Please pick a number from 1 to 8." << endl;
+                cout << "Invalid choice. Pick 1-4." << endl;
         }
     }
 

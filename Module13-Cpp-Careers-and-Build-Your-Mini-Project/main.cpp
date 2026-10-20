@@ -1,4 +1,4 @@
-// Module 13 - Mini Project: Student Record Manager
+// Module 13 - C++ Careers & Build Your Mini Project
 // The finished app. Changes are now saved back to students.csv, so the data
 // is still there the next time the program runs.
 #include <iostream>

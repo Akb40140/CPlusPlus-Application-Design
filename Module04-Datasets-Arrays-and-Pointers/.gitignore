@@ -1,0 +1,9 @@
+# Compiled binaries and debug info
+main
+records
+*.o
+*.out
+*.dSYM/
+
+# macOS
+.DS_Store

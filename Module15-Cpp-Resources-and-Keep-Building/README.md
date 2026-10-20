@@ -32,7 +32,7 @@ New things I'd have to learn for it: `vector` instead of fixed-size arrays, and
 maybe `map` to group students by class.
 
 ## Topic I still need to master: pointers and memory
-I used pointers in Module 4 (`int* count`) and `new` / `delete[]` in Module 12, but I
+I used pointers in Module 4 (`&scores[0]`) and `new` / `delete[]` in Module 12, but I
 still have to think hard about when to use `*` and `&`, and I don't really know what
 happens if I forget `delete`. Over the next two months I want to:
 - Do the learncpp.com chapters on pointers, references and dynamic memory

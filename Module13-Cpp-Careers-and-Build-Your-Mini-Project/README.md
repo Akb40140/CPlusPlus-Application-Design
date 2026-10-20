@@ -1,4 +1,4 @@
-# Module 13 - Mini Project: Student Record Manager
+# Module 13 - C++ Careers & Build Your Mini Project
 
 ## Assignment
 Build a mini C++ application using at least four course topics. Your project should

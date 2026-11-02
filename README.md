@@ -23,11 +23,15 @@ found with binary search. Each module added a new part to it.
 6. Creating Classes & Objects
 7. Security, Roles & Binary Search
 
+## Midterm Project
+The C++ Midway Project is in `Midterm`. It builds on Module 7 with a `Roster` class, a
+dynamic array, search by name, class statistics and saving to a file.
+
 ## How to run the application
-The newest version is in `Module07-Security-Roles-and-Binary-Search`.
+The newest version is in `Midterm`.
 ```
-cd Module07-Security-Roles-and-Binary-Search
-g++ -o records main.cpp
+cd Midterm
+g++ -o records main.cpp Student.cpp Roster.cpp
 ./records
 ```
 The Admin password for the demo is `admin123`.

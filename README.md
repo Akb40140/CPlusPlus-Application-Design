@@ -25,6 +25,9 @@ found with binary search. Each module added a new part to it.
 8. Input Validation & Protecting Data
 9. Using AI to Expand Your Application
 
+<!-- -->
+12. C++ & AI
+
 ## Where I used input validation (Module 8)
 All of the checks are in `Validation.h` / `Validation.cpp` in
 `Module08-Input-Validation-and-Protecting-Data`. Each function keeps asking until the input
@@ -74,6 +77,43 @@ short, personal study tip based on their math score.
 
 The code is in `Module09-Using-AI-to-Expand-Your-Application`.
 
+## Module 12 response: C++ & AI
+**The AI system I researched: PyTorch.** PyTorch is one of the most popular tools for
+building and training AI models. Meta created it, and it's now run by the PyTorch
+Foundation. Most people write PyTorch code in Python, but the heavy work underneath is
+done in C++.
+
+- **What C++ contributes:**
+  - **Speed.** Tensors (the big grids of numbers AI models use) and the math on them are
+    handled by a C++ library called ATen. Python gives the instructions, and C++ does the
+    millions of calculations.
+  - **Training.** The autograd engine, which works out how to adjust the model while it
+    learns, is written in C++.
+  - **GPUs.** The code that runs on NVIDIA graphics cards is written in CUDA, which is
+    based on C++.
+  - **Running models without Python.** LibTorch is PyTorch's C++ version. It lets a
+    trained model run inside apps, games, robots and devices where Python would be too
+    slow or too big.
+- **My performance feature:** I added two menu options to the Student Record Manager, in
+  `Stats.h` / `Stats.cpp`.
+  - `7. Class Statistics` works out the average, highest score, lowest score and number
+    of passing students in one loop, where doing each one separately would take four.
+  - `8. Search Speed Test` makes 1,000,000 sorted student ids with `new int[]`, counts
+    how many checks each search needs to find the last one, and frees the memory with
+    `delete[]`.
+    ```
+    --- Search Speed Test (1,000,000 students) ---
+    Linear search checks: 1000000
+    Binary search checks: 20
+    ```
+- **Where C++ would help if my app got much bigger:** With records for a whole school
+  district, C++ would matter for searching and sorting hundreds of thousands of students,
+  working out statistics for every class at once, controlling memory so the app doesn't
+  waste RAM, and preparing the AI Study Coach's data quickly before it goes to an AI
+  service.
+
+The code is in `Module12-Cpp-and-AI`.
+
 ## Midterm Project
 The C++ Midway Project is in `Midterm`. It builds on Module 7 with a `Roster` class, a
 dynamic array, search by name, class statistics and saving to a file.
@@ -86,3 +126,10 @@ g++ -o records main.cpp Student.cpp Roster.cpp
 ./records
 ```
 The Admin password for the demo is `admin123`.
+
+To run the Module 12 version with the statistics and speed test options:
+```
+cd Module12-Cpp-and-AI
+g++ -o records main.cpp Validation.cpp AICoach.cpp Stats.cpp
+./records
+```
